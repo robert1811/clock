@@ -6,55 +6,75 @@ function App() {
   const[breakLength, setBreakLength] = useState(5);
   const[sessionLength, setSessionLength] = useState(25);
   const[minute, setMinute] = useState(sessionLength);
-  const[second, setSecond] = useState("00");
+  const[second, setSecond] = useState(0);
   const[power, setPower] = useState(false);
   const[didStart, setDidStart] = useState(false);
+  const[session, setSession] = useState(true);
 
   useEffect(() => {
-  if(minute > 0 && minute <= 10){
-    setMinute("0" + minute - 1)
-  }else if(minute >= 0 && minute >= 10){
-    setMinute(minute)}
-    setTimeout(() => {
-        if(power && minute !== 0 && second !== 0){
-        if(second > 0 && second > 10){
-          setSecond(second - 1);
+      const timeout = setTimeout(() => {
+      if(second > 0){
+        if(power){
+          setSecond(second - 1);}
         } else if(second > 0 && second <= 10){
-          setSecond("0" + second - 1);
+          setSecond(second - 1);
         }  else if(second === 0){
           setSecond(59);
           setMinute(minute - 1);
-        } else if(minute > 0 && minute <= 10){
-          setMinute("0" + minute - 1);
-        } else if(minute === 0 && second === 0){
-          setMinute(breakLength);
-          setSecond("00")
-        }
-        }
-        }, 100);
-    }, [second, power, minute, sessionLength, breakLength])
+        } else if(minute > 0){
+          setMinute(minute - 1);
+        } 
+        if(!session && minute === 0 && second === 0){
+            setMinute(sessionLength);
+            setSecond(0);
+            setSession(true);
+        }else if(minute === 0 && second === 0){
+            setMinute(breakLength);
+            setSecond(0);
+            console.log("holaaa ");
+            setSession(false)
+          }
+        }, 1000);
+        if(!power){
+          clearTimeout(timeout);
+      }
+    }, [second, power, minute, sessionLength, breakLength, session])
+
+  
 
   const incrementBreak = () =>{
     if(breakLength !== 60 && !power){
-    setBreakLength(breakLength + 1)
+    setBreakLength(breakLength + 1);
+    if(!session){
+      setMinute(breakLength + 1);
+      setSecond(0);
+    }
     }
   }
   const decrementBreak = () =>{
     if(breakLength !== 1 && !power)
-    setBreakLength(breakLength - 1)
+    setBreakLength(breakLength - 1);
+    if(!session){
+      setMinute(breakLength - 1);
+      setSecond(0);
+    }
   }
   const incrementSession = () =>{
     if(sessionLength !== 60 && !power){
-    setSessionLength(sessionLength - 1 + 2);
+    setSessionLength(sessionLength + 1);
+    if(session){
     setMinute(sessionLength + 1);
-    setSecond("00");
+    setSecond(0);
+    }
     }
   }
   const decrementSession = () =>{
     if(sessionLength !== 1 && !power){
       setSessionLength(sessionLength - 1);
+      if(session){
       setMinute(sessionLength - 1);
-      setSecond("00");
+      setSecond(0);
+      }
     }
     
   }
@@ -62,7 +82,6 @@ function App() {
   const handlePause = () =>{
     if(!power){
       setPower(true);
-      document.querySelector('.bi-play-fill').classList.replace('bi-play-fill', 'bi-pause-fill');
       if(!didStart){
         setDidStart(true);
         setSecond(59);
@@ -70,28 +89,27 @@ function App() {
       }
       }else if(power){
         setPower(false);
-        document.querySelector('.bi-pause-fill').classList.replace('bi-pause-fill', 'bi-play-fill');
         setSecond(second);
         setMinute(minute);
-        clearTimeout();
       }
   }
 
   const reset = () =>{
-    clearTimeout();
     setPower(false);
-    setSessionLength(25);
-    setBreakLength(5);
-    setMinute(25);
-    setSecond("00");
-    setPower(false);
-    setDidStart(false);
+      setSessionLength(25);
+      setBreakLength(5);
+      setMinute(25);
+      setSecond(0);
+      setPower(false);
+      setSession(true);
+      setDidStart(false);
   }
 
   return (
     <div className="App">
         <h1>25 + 5 Clock</h1>
           <div id="clock-container">
+          <audio  id="beep" src="./audio/beep.mp3"></audio>
           <div id='label-container'>
             <div className="length-control">
               <div id='break-label'>Break Length</div>
@@ -120,19 +138,20 @@ function App() {
           </div>
           <div className="timer">
             <div className="time-wrapper">
-              <div id="timer-label">Session</div>
-              <div id="time-left">{minute}:{second}</div>
+              <div id="timer-label">{session ? "Session" : "Break"}</div>
+              <div id="time-left">{minute < 10 ? "0" + minute : minute}:{second < 10 ? "0" + second : second}</div>
             </div>
           </div>
           <div className="timer-control">
             <button id="start_stop" onClick={handlePause}>
-              <i className="bi bi-play-fill"></i>
+              <i className={!power ? "bi bi-play-fill" : "bi bi-pause-fill"}></i>
             </button>
             <button id="reset" onClick={reset}>
               <i className="bi bi-arrow-clockwise"></i>
             </button>
           </div>
           </div>
+          
     </div>
   );
 }
