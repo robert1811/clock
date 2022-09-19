@@ -6,10 +6,12 @@
 
 .App{
     height: fit-content;
+    color:white;
 }
 
 body{
     height: 100vh;
+    background-color: black;
 }
 
 h1{
@@ -24,6 +26,7 @@ button{
 i{
     font-size: 2em;
     cursor: pointer;
+    color:white;
 }
 
 .length{
@@ -67,7 +70,7 @@ i{
     margin-top: 15px;
     display: flex;
     justify-content: center;
-    border: black solid 5px;
+    border: white solid 5px;
     border-radius: 20px;
     width: 15vw;
     padding: 15px;

@@ -35,14 +35,22 @@ function App() {
             setSession(false)
           }
         }, 1000);
+        if(second === 0 && minute === 0){
+          playAudio();
+        }
         if(!power){
           clearTimeout(timeout);
       }
     }, [second, power, minute, sessionLength, breakLength, session])
 
-  
+  const audio = document.getElementById("beep");
+
+  const playAudio = () =>{
+    audio.play()
+  }
 
   const incrementBreak = () =>{
+    playAudio()
     if(breakLength !== 60 && !power){
     setBreakLength(breakLength + 1);
     if(!session){
@@ -95,21 +103,23 @@ function App() {
   }
 
   const reset = () =>{
+    audio.pause();
+    audio.currentTime = 0;
     setPower(false);
-      setSessionLength(25);
-      setBreakLength(5);
-      setMinute(25);
-      setSecond(0);
-      setPower(false);
-      setSession(true);
-      setDidStart(false);
+    setSessionLength(25);
+    setBreakLength(5);
+    setMinute(25);
+    setSecond(0);
+    setPower(false);
+    setSession(true);
+    setDidStart(false);
   }
 
   return (
     <div className="App">
         <h1>25 + 5 Clock</h1>
           <div id="clock-container">
-          <audio  id="beep" src="./audio/beep.mp3"></audio>
+          <audio  id="beep" src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav" />
           <div id='label-container'>
             <div className="length-control">
               <div id='break-label'>Break Length</div>
