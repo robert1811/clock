@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import './App.css';
 import {useState, useEffect} from 'react';
 
@@ -12,7 +13,7 @@ function App() {
   const[session, setSession] = useState(true);
 
   useEffect(() => {
-      const timeout = setTimeout(() => {
+      timeout = setTimeout(() => {
       if(second > 0){
         if(power){
           setSecond(second - 1);}
@@ -31,7 +32,6 @@ function App() {
         }else if(minute === 0 && second === 0){
             setMinute(breakLength);
             setSecond(0);
-            console.log("holaaa ");
             setSession(false)
           }
         }, 1000);
@@ -40,9 +40,12 @@ function App() {
         }
         if(!power){
           clearTimeout(timeout);
+          setMinute(minute);
+          setSecond(second);
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [second, power, minute, sessionLength, breakLength, session])
-
+  let timeout = null ;
   const audio = document.getElementById("beep");
 
   const playAudio = () =>{
@@ -50,7 +53,6 @@ function App() {
   }
 
   const incrementBreak = () =>{
-    playAudio()
     if(breakLength !== 60 && !power){
     setBreakLength(breakLength + 1);
     if(!session){
@@ -92,17 +94,19 @@ function App() {
       setPower(true);
       if(!didStart){
         setDidStart(true);
-        setSecond(59);
-        setMinute(minute - 1)
+        setSecond(0);
+        setMinute(sessionLength)
       }
       }else if(power){
         setPower(false);
         setSecond(second);
         setMinute(minute);
+        window.clearTimeout(timeout)
       }
   }
 
   const reset = () =>{
+    window.clearTimeout(timeout)
     audio.pause();
     audio.currentTime = 0;
     setPower(false);
